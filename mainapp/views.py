@@ -45,4 +45,4 @@ def stockTracker(request):
     #print(time_taken)
       
     #print(result)
-    return render(request, 'mainapp/stocktracker.html', {'data': data})
+    return render(request, 'mainapp/stocktracker.html', {'data': data, 'room_name': 'track'})
