@@ -4,6 +4,7 @@ from yahoo_fin.stock_info import *
 import time
 import queue
 from threading import Thread
+from asgiref.sync import sync_to_async
 # Create your views here.
 
 def stockPicker(request):
@@ -11,8 +12,19 @@ def stockPicker(request):
     print(stock_picker)
     return render(request, 'mainapp/stockpicker.html', {'stockpicker': stock_picker})
 
-def stockTracker(request):
+@sync_to_async
+def checkAuthenticated(request):
+    if not request.user.is_authenticated:
+        return False
+    else:
+        return True
+
+async def stockTracker(request):
+    is_loginned = await checkAuthenticated(request)
+    if not is_loginned:
+        return HttpResponse("Login First")
     stockpicker = request.GET.getlist('stockpicker')
+    stockshare=str(stockpicker)[1:-1]
     print(stockpicker)
     data = {}
     available_stocks = tickers_nifty50()
@@ -45,4 +57,4 @@ def stockTracker(request):
     #print(time_taken)
       
     #print(result)
-    return render(request, 'mainapp/stocktracker.html', {'data': data, 'room_name': 'track'})
+    return render(request, 'mainapp/stocktracker.html', {'data': data, 'room_name': 'track', 'selectedstock':stockshare})
